@@ -14,4 +14,4 @@ push:
 	git push -u origin main
 
 test:
-	npx -n --experimental-vm-modules jest
+	npx -n '--experimental-vm-modules --no-warnings' jest --colors

@@ -1,0 +1,1 @@
+SELECT CARD_ID, id FROM BILLING."transaction" t WHERE id IN ('123','321');

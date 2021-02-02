@@ -1,4 +1,7 @@
 import fs from 'fs';
+import path from 'path';
+
+const getPath = (filePath) => fs.readFileSync(path.resolve(filePath), 'utf8');
 
 const script = {
   getSqlQueries: () => {
@@ -7,10 +10,11 @@ const script = {
     console.log(query.replace(/\r?\n/g, "','").split('\n').join().trim());
   },
 
-  getCardIdByTransactionId: () => {
-    const data = fs.readFileSync('input').toString().split(',');
+  getCardIdByTransactionId: (file) => {
+    const data = getPath(file).split(',');
     const query = `SELECT CARD_ID, id FROM BILLING."transaction" t WHERE id IN ('${data}');`;
-    console.log(query.replace(/\r?\n/g, "','").split('\n').join().trim());
+    const result = query.replace(/\r?\n/g, "','").split('\n').join().trim();
+    return result;
   },
 
   getCloseDebtTransaction: () => {

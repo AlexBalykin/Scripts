@@ -1,3 +1,3 @@
 import script from '../src/index.js';
 
-script.getCardIdByTransactionId();
+console.log(script.getCardIdByTransactionId('input'));
