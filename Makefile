@@ -2,7 +2,7 @@ script:
 	node bin/\getCloseDebtTransaction.js > output
 
 sql:
-	node bin/\getSqlQueries.js > output
+	node bin/\getTransactionIdByCardId.js > output
 
 card:
 	node bin/\getCardIdByTransactionId.js > output
@@ -14,4 +14,4 @@ push:
 	git push -u origin main
 
 test:
-	npx -n '--experimental-vm-modules --no-warnings' jest --colors
+	npx jest --colors

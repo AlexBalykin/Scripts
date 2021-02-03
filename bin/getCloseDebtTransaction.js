@@ -1,3 +1,3 @@
 import script from '../src/index.js';
 
-script.getCloseDebtTransaction();
+console.log(script.getCloseDebtTransaction('input'));
