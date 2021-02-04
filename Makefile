@@ -7,6 +7,9 @@ sql:
 card:
 	node bin/\getCardIdByTransactionId.js > output
 
+driver:
+	node bin/\addDriver.js > output.csv
+
 awk:
 	cat input | awk '{ print $$3 }' > output
 	
@@ -15,3 +18,5 @@ push:
 
 test:
 	npx jest --colors
+		
+.PHONY: test

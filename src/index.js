@@ -19,6 +19,19 @@ const script = {
     return result;
   },
 
+  addDriver: (file) => {
+    const data = getPath(file).split('\n');
+    const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
+    const str = data.map((i) => i.split(' ').join().replace(',', ' ').replace(',', ' '));
+    const o = str.join().split(',');
+    const obj = {
+      CompanyName: o[0],
+      Occupation: o[1],
+    };
+    console.log(obj);
+    return `${csvHeader}${'\n'}${str.join('\n')}`;
+  },
+
   getCloseDebtTransaction: (file) => {
     const data = getPath(file).split('\n');
     if (data[0].length < 15) {
