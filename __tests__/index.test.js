@@ -25,6 +25,14 @@ test('addDriver', async () => {
   await expect(fu).toEqual(equal);
 });
 
+test('zk cards', async () => {
+  const data1 = getPath('zk cards database');
+  const data2 = getPath('zk cards');
+  const fu = script.genDiff(data1, data2);
+  const equal = await fs.readFile(getPath('zk equal'), 'utf8');
+  await expect(fu).toEqual(equal);
+});
+
 test.each([
   ['debtBinCard before.txt', 'debtBinCard after.txt'],
   ['debtSqlQuery before.txt', 'debtSqlQuery after.txt'],

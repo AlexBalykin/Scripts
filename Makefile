@@ -10,6 +10,9 @@ card:
 driver:
 	node bin/\addDriver.js > output.csv
 
+diff:
+	node bin/\diff.js > output
+
 awk:
 	cat input | awk '{ print $$3 }' > output
 	

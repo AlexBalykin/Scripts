@@ -19,6 +19,15 @@ const script = {
     return result;
   },
 
+  genDiff: (file1, file2) => {
+    const data1 = getPath(file1)
+      .split('\n')
+      .map((i) => i.slice(0, -9));
+    const data2 = getPath(file2).split('\n');
+    const diff = data2.filter((i) => !data1.includes(i));
+    return diff.join('\n');
+  },
+
   addDriver: (file) => {
     const data = getPath(file).split('\n');
     const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
