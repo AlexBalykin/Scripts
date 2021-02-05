@@ -1,3 +1,3 @@
 import script from '../src/index.js';
 
-console.log(script.addDriver('input'));
+process.stdout.write(script.addDriver('input'));

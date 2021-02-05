@@ -15,6 +15,7 @@ const script = {
   getCardIdByTransactionId: (file) => {
     const data = getPath(file).split(',');
     const query = `SELECT CARD_ID, id FROM BILLING."transaction" t WHERE id IN ('${data}');`;
+    // const query = `SELECT c.pan as "Номер карты", tt.name as "Абонемент", ts.name as "Статус", t.start_date as "Начало действия", t.expire_date as "Конец действия", inv.C_DATE AS "дата покупки" , t2."number" FROM billing.ticket t left join billing.ticket_card tc on t.id = tc.ticket_id left join billing.ticket_status ts on t.status_id =ts.id  left join billing.ticket_type tt on t.type_id=tt.id left join billing.card c on tc.card_id=c.id left join billing.INVOICE inv on inv.TICKET_ID =t.ID left join billing."transaction" t2 on t2.CARD_ID = INV.CARD_ID  WHERE inv.STATUS_ID = 2 AND ts.id = 1 AND t2."number" in ('${data}');`;
     const result = regexp(query);
     return result;
   },
@@ -32,12 +33,6 @@ const script = {
     const data = getPath(file).split('\n');
     const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
     const str = data.map((i) => i.split(' ').join().replace(',', ' ').replace(',', ' '));
-    const o = str.join().split(',');
-    const obj = {
-      CompanyName: o[0],
-      Occupation: o[1],
-    };
-    console.log(obj);
     return `${csvHeader}${'\n'}${str.join('\n')}`;
   },
 

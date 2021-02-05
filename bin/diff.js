@@ -1,3 +1,3 @@
 import script from '../src/index.js';
 
-console.log(script.genDiff('file1', 'file2'));
+process.stdout.write(script.genDiff('file1', 'file2'));

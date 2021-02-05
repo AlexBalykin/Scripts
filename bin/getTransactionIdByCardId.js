@@ -1,3 +1,3 @@
 import script from '../src/index.js';
 
-console.log(script.getTransactionIdByCardId('input'));
+process.stdout.write(script.getTransactionIdByCardId('input'));
