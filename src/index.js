@@ -11,7 +11,7 @@ const script = {
     fs.writeFileSync('awk', awk.join('\n'));
 
     const data = getPath('awk').split(',');
-    const query = `SELECT t.id, t.REGION_ID, ts."name" AS Статус, cdts."name" AS Статус_долга, ct."name" AS Карта FROM BILLING."transaction" t LEFT JOIN CARD_DEBT_TRANSACTION cd ON t.ID = cd.TRANSACTION_ID LEFT JOIN TRANSACTION_STATUS TS ON t.STATUS_ID = ts.ID LEFT JOIN CARD_DEBT_TRANSACTION_STATUS CDTS ON cd.STATUS_ID = cdts.ID LEFT JOIN CARD C ON t.CARD_ID=c.ID LEFT JOIN CARD_TYPE CT ON ct.ID=c.TYPE_ID WHERE t.CARD_ID in ('${data}') AND t.STATUS_ID IN (1,2,4) and cd.STATUS_ID IN (1,2,4);`;
+    const query = `SELECT t.id, t.REGION_ID, ts."name" AS Статус, cdts."name" AS Статус_долга, ct."name" AS Карта FROM BILLING."transaction" t LEFT JOIN CARD_DEBT_TRANSACTION cd ON t.ID = cd.TRANSACTION_ID LEFT JOIN TRANSACTION_STATUS TS ON t.STATUS_ID = ts.ID LEFT JOIN CARD_DEBT_TRANSACTION_STATUS CDTS ON cd.STATUS_ID = cdts.ID LEFT JOIN CARD C ON t.CARD_ID=c.ID LEFT JOIN CARD_TYPE CT ON ct.ID=c.TYPE_ID WHERE t.ID in ('${data}') AND t.STATUS_ID IN (1,2,4) and cd.STATUS_ID IN (1,2,4);`;
     const result = regexp(query);
     fs.unlinkSync(path.resolve('awk'));
     return result;
@@ -35,10 +35,16 @@ const script = {
   },
 
   addDriver: (file) => {
-    const data = getPath(file).split('\n');
     const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
-    const str = data.map((i) => i.split(' ').join().replace(',', ' ').replace(',', ' '));
-    return `${csvHeader}${'\n'}${str.join('\n')}`;
+    const data = getPath(file).split('\n');
+    const firstStr = data.shift().split(',');
+    const companyName = firstStr.shift();
+    const occupation = firstStr[0];
+    const firstStrStylish = firstStr.map((i) => i.replace(/ /g, ','));
+    const result = data
+      .map((i) => `${companyName}${','}${occupation}${','}${i.replace(/ /g, ',')}${','}${','}${'1234,'}${'123411'}`)
+      .join('\n');
+    return `${csvHeader}${'\n'}${companyName}${','}${firstStrStylish.join()}${'\n'}${result}`;
   },
 
   getCloseDebtTransaction: (file) => {

@@ -17,6 +17,6 @@ push:
 	git push -u origin main
 
 test:
-	npx jest --colors
+	npx jest
 		
 .PHONY: test
