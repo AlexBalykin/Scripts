@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 const getPath = (filePath) => fs.readFileSync(path.resolve(filePath), 'utf8');
 const regexp = (str) => str.replace(/\r?\n/g, "','").split('\n').join().trim();
@@ -30,8 +31,8 @@ const script = {
     return result;
   },
 
-  genDiff: (file1, file2) => {
-    const data1 = getPath(file1)
+  genDiff: (file, file2) => {
+    const data1 = getPath(file)
       .split('\n')
       .map((i) => i.slice(0, -9));
     const data2 = getPath(file2).split('\n');
@@ -39,16 +40,17 @@ const script = {
     return diff.join('\n');
   },
 
-  addDriver: (file) => {
+  addDriver: (file, file1) => {
     const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
     const data = getPath(file).split('\n');
+    const personalNr = getPath(file1).split('\n');
     const firstStr = data[0].split(',');
     firstStr[2] = firstStr[2].replace(/ /g, ',');
     const companyName = firstStr[0];
     const occupation = firstStr[1];
     const result = data
       .slice(1)
-      .map((i) => `${companyName}${','}${occupation}${','}${i.replace(/ /g, ',')}${','}${','}${'1234,'}${'123411'}`)
+      .map((i, n) => `${companyName}${','}${occupation}${','}${i.replace(/ /g, ',')}${','}${','}${personalNr[n]}${','}${personalNr[n]}${11}`)
       .join('\n');
     return `${csvHeader}${'\n'}${firstStr.join()}${'\n'}${result}`;
   },
@@ -62,5 +64,14 @@ const script = {
     const query = data.map((i) => `SELECT db_admin.close_debt_transaction('${i.trim()}');`);
     return query.join('\n');
   },
+  sha1: (file) => {
+    const data = getPath(file).split('\n');
+    const secret = 'secret key';
+    const sha = data
+      .map((i) => crypto.createHmac('sha1', secret).update(i).digest('hex'))
+      .join('\n');
+    return sha;
+  },
+
 };
 export default script;
