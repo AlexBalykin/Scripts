@@ -12,6 +12,9 @@ driver:
 
 diff:
 	node bin/\diff.js > output
+
+sha:
+	node bin/\sha.js > output	
 	
 push:
 	git push -u origin main

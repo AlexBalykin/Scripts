@@ -1,1 +1,2 @@
-SELECT CARD_ID, id FROM BILLING."transaction" t WHERE id IN ('123','321','0101');
+SELECT CARD_ID, id FROM BILLING."transaction" t
+ WHERE id IN ('123','321','0101');
