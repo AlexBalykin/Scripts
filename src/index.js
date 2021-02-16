@@ -66,6 +66,34 @@ const script = {
       .join('\n');
     return `${csvHeader}${'\n'}${firstStr.join()}${'\n'}${result}`;
   },
+  addTerminal: (file) => {
+    const csvHeader = 'Number,CompanyId,RegionId,InventoryNumber,TerminalModelId,VehicleId,Enabled,EcomMerchantId,MerchantCode,StoreNr,Tid,TerminalNr,MccCode,Currency,TerminalOption,TerminalModel,SoftwareVersion,Serial';
+    const data = getPath(file).split('\n');
+    const firstStr = data[0].split(',');
+    const obj = {
+      companyId: firstStr[1],
+      regionId: firstStr[2],
+      inventoryNumber: 1,
+      terminalModelId: firstStr[4],
+      vehicleId: '',
+      enabled: true,
+      ecomMerchantId: firstStr[7],
+      merchantCode: firstStr[8],
+    };
+    const obj2 = {
+      mccCode: 4111,
+      currency: 643,
+      terminalOption: 'J1',
+      terminalModel: 'Q',
+      softwareVersion: 1,
+      serial: 'TKP000000001',
+    };
+    const result = data
+      .slice(1)
+      .map((i) => `${i}${','}${Object.values(obj)}${','}${i.slice(0, -4)}${','}${i}${','}${i.slice(4)}${','}${Object.values(obj2)}`)
+      .join('\n');
+    return `${csvHeader}${'\n'}${firstStr}${'\n'}${result}`;
+  },
   getCloseDebtTransaction: (file) => {
     const data = getPath(file).split('\n');
     if (data[0].length < 15) {

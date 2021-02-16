@@ -10,6 +10,9 @@ query:
 driver:
 	node bin/\addDriver.js > output.csv
 
+term:
+	node bin/\addTerminal.js > output.csv
+
 diff:
 	node bin/\diff.js > output
 

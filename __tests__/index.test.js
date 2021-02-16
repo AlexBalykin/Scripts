@@ -27,6 +27,13 @@ test('addDriver', async () => {
   expect(fu).toEqual(equal);
 });
 
+test('addTerminal', async () => {
+  const data = getPath('addTerminal before');
+  const fu = script.addTerminal(data);
+  const equal = await readFile('addTerminal after.csv');
+  expect(fu).toEqual(equal);
+});
+
 test('zk cards', async () => {
   const data1 = getPath('zk cards database');
   const data2 = getPath('zk cards');
