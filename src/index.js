@@ -4,6 +4,15 @@ import crypto from 'crypto';
 
 const getPath = (filePath) => fs.readFileSync(path.resolve(filePath), 'utf8');
 const regexp = (str) => str.replace(/\r?\n/g, "','").split('\n').join().trim();
+const query = (data) => `SELECT t.id, t.REGION_ID, ts."name" AS Статус, cdts."name" AS Статус_долга, ct."name" AS Карта
+ FROM BILLING."transaction" t
+ LEFT JOIN CARD_DEBT_TRANSACTION cd ON t.ID = cd.TRANSACTION_ID
+ LEFT JOIN TRANSACTION_STATUS TS ON t.STATUS_ID = ts.ID
+ LEFT JOIN CARD_DEBT_TRANSACTION_STATUS CDTS ON cd.STATUS_ID = cdts.ID
+ LEFT JOIN CARD C ON t.CARD_ID=c.ID
+ LEFT JOIN CARD_TYPE CT ON ct.ID=c.TYPE_ID
+ WHERE t.CARD_ID IN ('${data}')
+ AND t.STATUS_ID IN (1,2,4) AND cd.STATUS_ID IN (1,2,4);`;
 
 const script = {
   getTransactionIdByCardId: (file) => {
@@ -12,29 +21,11 @@ const script = {
       const awk = data1.map((i) => i.split('\t')[2]);
       fs.writeFileSync('awk', awk.join('\n'));
       const data = regexp(getPath('awk'));
-      const query = `SELECT t.id, t.REGION_ID, ts."name" AS Статус, cdts."name" AS Статус_долга, ct."name" AS Карта
- FROM BILLING."transaction" t
- LEFT JOIN CARD_DEBT_TRANSACTION cd ON t.ID = cd.TRANSACTION_ID
- LEFT JOIN TRANSACTION_STATUS TS ON t.STATUS_ID = ts.ID
- LEFT JOIN CARD_DEBT_TRANSACTION_STATUS CDTS ON cd.STATUS_ID = cdts.ID
- LEFT JOIN CARD C ON t.CARD_ID=c.ID
- LEFT JOIN CARD_TYPE CT ON ct.ID=c.TYPE_ID
- WHERE t.CARD_ID IN ('${data}')
- AND t.STATUS_ID IN (1,2,4) AND cd.STATUS_ID IN (1,2,4);`;
       fs.unlinkSync(path.resolve('awk'));
-      return query;
+      return query(data);
     }
     const data = regexp(getPath(file));
-    const query = `SELECT t.id, t.REGION_ID, ts."name" AS Статус, cdts."name" AS Статус_долга, ct."name" AS Карта
- FROM BILLING."transaction" t
- LEFT JOIN CARD_DEBT_TRANSACTION cd ON t.ID = cd.TRANSACTION_ID
- LEFT JOIN TRANSACTION_STATUS TS ON t.STATUS_ID = ts.ID
- LEFT JOIN CARD_DEBT_TRANSACTION_STATUS CDTS ON cd.STATUS_ID = cdts.ID
- LEFT JOIN CARD C ON t.CARD_ID=c.ID
- LEFT JOIN CARD_TYPE CT ON ct.ID=c.TYPE_ID
- WHERE t.CARD_ID IN ('${data}')
- AND t.STATUS_ID IN (1,2,4) AND cd.STATUS_ID IN (1,2,4);`;
-    return query;
+    return query(data);
   },
   getQuery: (file) => {
     const data = regexp(getPath(file));
@@ -51,18 +42,26 @@ const script = {
       .join('\n');
     return diff;
   },
-  addDriver: (file, file1) => {
+  addDriver: (file) => {
+    const reg = (str) => str.replace(/ /g, ',').replace(/[0-9]/g, '');
     const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
     const data = getPath(file).split('\n');
-    const terminalPassword = getPath(file1).split('\n');
+    const terminalPassword = data
+      .slice(1)
+      .join()
+      .replace(/\D+/g, ' ')
+      .split(' ')
+      .filter((i) => i.trim());
     const firstStr = data[0].split(',');
     firstStr[2] = firstStr[2].replace(/ /g, ',');
-    const companyName = firstStr[0];
-    const occupation = firstStr[1];
+    const obj = {
+      companyName: firstStr[0],
+      occupation: firstStr[1],
+      emptyStr: '',
+    };
     const result = data
       .slice(1)
-      .map((i, n) => `${companyName}${','}${occupation}${','}${i.replace(/ /g, ',')}${','}${','}${','}${
-        terminalPassword[n]}${11}`)
+      .map((i, t) => `${Object.values(obj)}${reg(i)}${','.repeat(2)}${terminalPassword[t]}${11}`)
       .join('\n');
     return `${csvHeader}${'\n'}${firstStr.join()}${'\n'}${result}`;
   },
@@ -102,10 +101,10 @@ const script = {
         .join('\n');
       return result;
     }
-    const query = data
+    const debt = data
       .map((i) => `SELECT db_admin.close_debt_transaction('${i.trim()}');`)
       .join('\n');
-    return query;
+    return debt;
   },
   sha1: (file) => {
     const data = getPath(file).split('\n');
