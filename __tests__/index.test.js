@@ -21,8 +21,7 @@ test('byCardId', async () => {
 
 test('addDriver', async () => {
   const data = getPath('addDriver before.txt');
-  const data1 = getPath('addDriver personalNr');
-  const fu = script.addDriver(data, data1);
+  const fu = script.addDriver(data);
   const equal = await readFile('addDriver after.csv');
   expect(fu).toEqual(equal);
 });
