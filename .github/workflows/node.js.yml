@@ -18,10 +18,6 @@ jobs:
         node-version: [14.x]
 
     steps:
-      - name: Run linter
-        # Run Linter
-        run: |
-          make lint
       - name: Test & publish code coverage
         # Publish code coverage on Code Climate
         # https://github.com/paambaati/codeclimate-action
