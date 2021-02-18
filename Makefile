@@ -1,3 +1,11 @@
+install: install-deps
+
+install-deps:
+	npm ci
+
+lint:
+	npx eslint .
+
 debt:
 	node bin/\getCloseDebtTransaction.js > output
 
@@ -27,8 +35,5 @@ test:
 
 test-coverage:
 	npm test -- --coverage --coverageProvider=v8
-
-lint:
-	npx eslint .
 
 .PHONY: test
