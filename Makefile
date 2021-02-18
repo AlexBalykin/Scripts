@@ -6,6 +6,9 @@ install-deps:
 lint:
 	npx eslint .
 
+link:
+	npm link
+
 debt:
 	node bin/\getCloseDebtTransaction.js > output
 
@@ -31,7 +34,7 @@ push:
 	git push -u origin main
 
 test:
-	npm test
+	npx jest
 
 test-coverage:
 	npm test -- --coverage --coverageProvider=v8
