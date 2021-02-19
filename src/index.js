@@ -69,6 +69,9 @@ const script = {
     const csvHeader = 'Number,CompanyId,RegionId,InventoryNumber,TerminalModelId,VehicleId,Enabled,EcomMerchantId,MerchantCode,StoreNr,Tid,TerminalNr,MccCode,Currency,TerminalOption,TerminalModel,SoftwareVersion,Serial';
     const data = getPath(file).split('\n');
     const firstStr = data[0].split(',');
+    const number = data
+      .slice(1)
+      .map((i) => `${','}${i.slice(0, -4)}${','}${i}${','}${i.slice(4)}${','}`);
     const obj = {
       companyId: firstStr[1],
       regionId: firstStr[2],
@@ -89,7 +92,7 @@ const script = {
     };
     const result = data
       .slice(1)
-      .map((i) => `${i}${','}${Object.values(obj)}${','}${i.slice(0, -4)}${','}${i}${','}${i.slice(4)}${','}${Object.values(obj2)}`)
+      .map((i, n) => `${i}${','}${Object.values(obj)}${number[n]}${Object.values(obj2)}`)
       .join('\n');
     return `${csvHeader}${'\n'}${firstStr}${'\n'}${result}`;
   },

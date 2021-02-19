@@ -6,9 +6,6 @@ install-deps:
 lint:
 	npx eslint .
 
-link:
-	npm link
-
 debt:
 	node bin/\getCloseDebtTransaction.js > output
 
