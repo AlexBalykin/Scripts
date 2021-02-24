@@ -6,12 +6,6 @@ install-deps:
 lint:
 	npx eslint .
 
-build:
-	NODE_ENV='production' npx webpack
-
-start:
-	npx webpack serve
-
 debt:
 	node bin/\getCloseDebtTransaction.js > output
 
