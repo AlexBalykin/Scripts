@@ -29,16 +29,15 @@ const script = {
   },
   getQuery: (file) => {
     const data = regexp(getPath(file));
-    return `SELECT CARD_ID, id FROM BILLING."transaction" t
- WHERE id IN ('${data}');`;
+    return `SELECT number, COMPANY_ID FROM reference_data.TERMINAL WHERE COMPANY_ID in ('${data}');`;
   },
   genDiff: (file, file2) => {
-    const data1 = getPath(file)
-      .split('\n')
-      .map((i) => i.slice(0, -9));
+    const data1 = getPath(file);
+    // .split('\n')
+    // .map((i) => i.slice(0, -9));
     const data2 = getPath(file2).split('\n');
     const diff = data2
-      .filter((i) => !data1.includes(i))
+      .filter((i) => data1.includes(i))
       .join('\n');
     return diff;
   },
@@ -46,12 +45,12 @@ const script = {
     const reg = (str) => str.replace(/ /g, ',').replace(/[0-9]/g, '');
     const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
     const data = getPath(file).split('\n');
-    const terminalPassword = data
-      .slice(1)
-      .join()
-      .replace(/\D+/g, ' ')
-      .split(' ')
-      .filter((i) => i.trim());
+    // const terminalPassword = data
+    //   .slice(1)
+    //   .join()
+    //   .replace(/\D+/g, ' ')
+    //   .split(' ')
+    //   .filter((i) => i.trim());
     const firstStr = data[0].split(',');
     firstStr[2] = firstStr[2].replace(/ /g, ',');
     const obj = {
@@ -61,7 +60,7 @@ const script = {
     };
     const result = data
       .slice(1)
-      .map((i, t) => `${Object.values(obj)}${reg(i)}${','.repeat(2)}${terminalPassword[t]}${11}`)
+      .map((i) => `${Object.values(obj)}${reg(i)}${','.repeat(3)}${1}`) // ${terminalPassword[t]}
       .join('\n');
     return `${csvHeader}${'\n'}${firstStr.join()}${'\n'}${result}`;
   },
@@ -117,6 +116,13 @@ const script = {
       .join('\n');
     return sha;
   },
-
+  jsonParse: (file) => {
+    const data = getPath(file)
+      .split('\n')
+      .map((i) => JSON.parse(i));
+    return data
+      .map((i) => i.CardId)
+      .join('\n');
+  },
 };
 export default script;

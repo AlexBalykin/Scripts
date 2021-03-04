@@ -26,9 +26,15 @@ diff:
 
 sha:
 	node bin/\sha.js > output	
+
+parse:
+	node bin/\json.js > output
 	
 push:
 	git push -u origin main
+
+awk:
+	cat input | awk '{ print $$4 }' > output
 
 test:
 	npx jest
