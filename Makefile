@@ -34,12 +34,10 @@ push:
 	git push -u origin main
 
 awk:
-	cat input | awk '{ print $$4 }' > output
+	cat input | awk '{ print $$3 }' > output
 
 test:
 	npx jest
 
 test-coverage:
 	npm test -- --coverage --coverageProvider=v8
-
-.PHONY: test

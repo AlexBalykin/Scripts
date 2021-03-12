@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
-const getPath = (filePath) => fs.readFileSync(path.resolve(filePath), 'utf8');
+const readFile = (filename) => fs.readFileSync(path.resolve(filename), 'utf8');
 const regexp = (str) => str.replace(/\r?\n/g, "','").split('\n').join().trim();
 const query = (data) => `SELECT t.id, t.REGION_ID, ts."name" AS Статус, cdts."name" AS Статус_долга, ct."name" AS Карта
  FROM BILLING."transaction" t
@@ -16,35 +16,36 @@ const query = (data) => `SELECT t.id, t.REGION_ID, ts."name" AS Статус, cd
 
 const script = {
   getTransactionIdByCardId: (file) => {
-    const data1 = getPath(file).split('\n');
+    const data1 = readFile(file).split('\n');
     if (data1[0].length > 40) {
       const awk = data1.map((i) => i.split('\t')[2]);
       fs.writeFileSync('awk', awk.join('\n'));
-      const data = regexp(getPath('awk'));
+      const data = regexp(readFile('awk'));
       fs.unlinkSync(path.resolve('awk'));
       return query(data);
     }
-    const data = regexp(getPath(file));
+    const data = regexp(readFile(file));
     return query(data);
   },
   getQuery: (file) => {
-    const data = regexp(getPath(file));
-    return `SELECT number, COMPANY_ID FROM reference_data.TERMINAL WHERE COMPANY_ID in ('${data}');`;
+    const data = regexp(readFile(file));
+    return `SELECT CARD_ID, id FROM BILLING."transaction" t
+ WHERE id IN ('${data}');`;
   },
   genDiff: (file, file2) => {
-    const data1 = getPath(file);
+    const data1 = readFile(file);
     // .split('\n')
     // .map((i) => i.slice(0, -9));
-    const data2 = getPath(file2).split('\n');
+    const data2 = readFile(file2).split('\n');
     const diff = data2
-      .filter((i) => data1.includes(i))
+      .filter((i) => !data1.includes(i.slice(0, 8)))
       .join('\n');
     return diff;
   },
   addDriver: (file) => {
     const reg = (str) => str.replace(/ /g, ',').replace(/[0-9]/g, '');
     const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
-    const data = getPath(file).split('\n');
+    const data = readFile(file).split('\n');
     // const terminalPassword = data
     //   .slice(1)
     //   .join()
@@ -66,7 +67,7 @@ const script = {
   },
   addTerminal: (file) => {
     const csvHeader = 'Number,CompanyId,RegionId,InventoryNumber,TerminalModelId,VehicleId,Enabled,EcomMerchantId,MerchantCode,StoreNr,Tid,TerminalNr,MccCode,Currency,TerminalOption,TerminalModel,SoftwareVersion,Serial';
-    const data = getPath(file).split('\n');
+    const data = readFile(file).split('\n');
     const firstStr = data[0].split(',');
     const number = data
       .slice(1)
@@ -96,7 +97,7 @@ const script = {
     return `${csvHeader}${'\n'}${firstStr}${'\n'}${result}`;
   },
   getCloseDebtTransaction: (file) => {
-    const data = getPath(file).split('\n');
+    const data = readFile(file).split('\n');
     if (data[0].length < 15) {
       const result = data
         .map((i) => `31064700${i.trim()}`)
@@ -109,7 +110,7 @@ const script = {
     return debt;
   },
   sha1: (file) => {
-    const data = getPath(file).split('\n');
+    const data = readFile(file).split('\n');
     const secret = 'secret key';
     const sha = data
       .map((i) => crypto.createHmac('sha1', secret).update(i).digest('hex'))
@@ -117,7 +118,7 @@ const script = {
     return sha;
   },
   jsonParse: (file) => {
-    const data = getPath(file)
+    const data = readFile(file)
       .split('\n')
       .map((i) => JSON.parse(i));
     return data
