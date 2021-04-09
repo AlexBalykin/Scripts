@@ -6,44 +6,44 @@ const getPath = (filename) => path.join('__tests__', '__fixtures__', filename);
 const readFile = (filename) => fs.readFile(getPath(filename), 'utf-8');
 
 test('byTransactionId', async () => {
-  const data = getPath('byTransactionId before.txt');
+  const data = getPath('byTransactionIdBefore.txt');
   const fu = script.getQuery(data);
-  const equal = await readFile('byTransactionId after.txt');
+  const equal = await readFile('byTransactionIdAfter.txt');
   expect(fu).toEqual(equal);
 });
 
 test('byCardId', async () => {
-  const data = getPath('byCardId before.txt');
+  const data = getPath('byCardIdBefore.txt');
   const fu = script.getTransactionIdByCardId(data);
-  const equal = await readFile('byCardId after.txt');
+  const equal = await readFile('byCardIdAfter.txt');
   expect(fu).toEqual(equal);
 });
 
 test('addDriver', async () => {
-  const data = getPath('addDriver before.txt');
+  const data = getPath('addDriverBefore.txt');
   const fu = script.addDriver(data);
-  const equal = await readFile('addDriver after.csv');
+  const equal = await readFile('addDriverAfter.csv');
   expect(fu).toEqual(equal);
 });
 
 test('addTerminal', async () => {
-  const data = getPath('addTerminal before');
+  const data = getPath('addTerminalBefore');
   const fu = script.addTerminal(data);
-  const equal = await readFile('addTerminal after.csv');
+  const equal = await readFile('addTerminalAfter.csv');
   expect(fu).toEqual(equal);
 });
 
-test('zk cards', async () => {
-  const data1 = getPath('zk cards database');
-  const data2 = getPath('zk cards');
+test('zkCards', async () => {
+  const data1 = getPath('zkCardsDatabase');
+  const data2 = getPath('zkCards');
   const fu = script.genDiff(data1, data2);
-  const equal = await readFile('zk equal');
+  const equal = await readFile('zkEqual');
   expect(fu).toEqual(equal);
 });
 
 test.each([
-  ['debtBinCard before.txt', 'debtBinCard after.txt'],
-  ['debtSqlQuery before.txt', 'debtSqlQuery after.txt'],
+  ['debtBinCardBefore.txt', 'debtBinCardAfter.txt'],
+  ['debtSqlQueryBefore.txt', 'debtSqlQueryAfter.txt'],
 ])('%s', async (filename, equal) => {
   const data = getPath(filename);
   const equalFormat = await readFile(equal);

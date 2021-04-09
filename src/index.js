@@ -14,8 +14,8 @@ const query = (data) => `SELECT t.id, t.REGION_ID, ts."name" AS Статус, cd
  WHERE t.CARD_ID IN ('${data}')
  AND t.STATUS_ID IN (1,2,4) AND cd.STATUS_ID IN (1,2,4);`;
 
-const script = {
-  getTransactionIdByCardId: (file) => {
+export default {
+  getTransactionIdByCardId(file) {
     const data1 = readFile(file).split('\n');
     if (data1[0].length > 40) {
       const awk = data1.map((i) => i.split('\t')[2]);
@@ -27,12 +27,12 @@ const script = {
     const data = regexp(readFile(file));
     return query(data);
   },
-  getQuery: (file) => {
+  getQuery(file) {
     const data = regexp(readFile(file));
     return `SELECT CARD_ID, id FROM BILLING."transaction" t
  WHERE id IN ('${data}');`;
   },
-  genDiff: (file, file2) => {
+  genDiff(file, file2) {
     const data1 = readFile(file);
     // .split('\n')
     // .map((i) => i.slice(0, -9));
@@ -42,30 +42,31 @@ const script = {
       .join('\n');
     return diff;
   },
-  addDriver: (file) => {
+  addDriver(file) {
     const reg = (str) => str.replace(/ /g, ',').replace(/[0-9]/g, '');
     const csvHeader = 'CompanyName,Occupation,LastName,FirstName,MiddleName,Phone,PersonalNr,TerminalPassword';
     const data = readFile(file).split('\n');
-    // const terminalPassword = data
-    //   .slice(1)
-    //   .join()
-    //   .replace(/\D+/g, ' ')
-    //   .split(' ')
-    //   .filter((i) => i.trim());
+    const terminalPassword = data
+      .slice(1)
+      .join()
+      .replace(/\D+/g, ' ')
+      .split(' ')
+      .filter((i) => i.trim());
     const firstStr = data[0].split(',');
     firstStr[2] = firstStr[2].replace(/ /g, ',');
+    const { 0: companyName, 1: occupation } = firstStr;
     const obj = {
-      companyName: firstStr[0],
-      occupation: firstStr[1],
+      companyName,
+      occupation,
       emptyStr: '',
     };
     const result = data
       .slice(1)
-      .map((i) => `${Object.values(obj)}${reg(i)}${','.repeat(3)}${1}`) // ${terminalPassword[t]}
+      .map((i, t) => `${Object.values(obj)}${reg(i)}${','.repeat(1)}${terminalPassword[t] ?? ','}${','}${1}`)
       .join('\n');
     return `${csvHeader}${'\n'}${firstStr.join()}${'\n'}${result}`;
   },
-  addTerminal: (file) => {
+  addTerminal(file) {
     const csvHeader = 'Number,CompanyId,RegionId,InventoryNumber,TerminalModelId,VehicleId,Enabled,EcomMerchantId,MerchantCode,StoreNr,Tid,TerminalNr,MccCode,Currency,TerminalOption,TerminalModel,SoftwareVersion,Serial';
     const data = readFile(file).split('\n');
     const firstStr = data[0].split(',');
@@ -96,7 +97,7 @@ const script = {
       .join('\n');
     return `${csvHeader}${'\n'}${firstStr}${'\n'}${result}`;
   },
-  getCloseDebtTransaction: (file) => {
+  getCloseDebtTransaction(file) {
     const data = readFile(file).split('\n');
     if (data[0].length < 15) {
       const result = data
@@ -109,7 +110,7 @@ const script = {
       .join('\n');
     return debt;
   },
-  sha1: (file) => {
+  sha1(file) {
     const data = readFile(file).split('\n');
     const secret = 'secret key';
     const sha = data
@@ -117,7 +118,7 @@ const script = {
       .join('\n');
     return sha;
   },
-  jsonParse: (file) => {
+  jsonParse(file) {
     const data = readFile(file)
       .split('\n')
       .map((i) => JSON.parse(i));
@@ -126,4 +127,3 @@ const script = {
       .join('\n');
   },
 };
-export default script;
